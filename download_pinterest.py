@@ -3,7 +3,7 @@ import re
 import os
 from urllib.parse import urlparse
 
-URL = "https://pin.it/2ZczqqkCW"
+URL = "https://pin.it/30k6YVXzc"
 OUTPUT_DIR = "pinterest_raw"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
