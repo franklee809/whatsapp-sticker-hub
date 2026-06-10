@@ -38,9 +38,14 @@ def process_grid():
             
         h_orig, w_orig, _ = img.shape
         
-        # 1. Convert to grayscale and threshold
+        # 1. Convert to grayscale and threshold dynamically
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        _, thresh = cv2.threshold(gray, 240, 255, cv2.THRESH_BINARY_INV)
+        
+        # Determine background color from corners
+        bg_val = int(np.mean([gray[0, 0], gray[0, w_orig-1], gray[h_orig-1, 0], gray[h_orig-1, w_orig-1]]))
+        thresh_val = min(bg_val - 25, 220)
+        
+        _, thresh = cv2.threshold(gray, thresh_val, 255, cv2.THRESH_BINARY_INV)
         
         # 2. Use a small 3x3 dilation kernel to join very close lines
         kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
@@ -114,8 +119,8 @@ def process_grid():
             crop = img[y:y+h, x:x+w].copy()
             crop_gray = cv2.cvtColor(crop, cv2.COLOR_BGR2GRAY)
             
-            # Binary threshold: 255 for white background, 0 for lines
-            _, binary = cv2.threshold(crop_gray, 240, 255, cv2.THRESH_BINARY)
+            # Binary threshold: 255 for background/body, 0 for lines
+            _, binary = cv2.threshold(crop_gray, thresh_val, 255, cv2.THRESH_BINARY)
             
             # --- PREVENT LEAKAGE FIX ---
             # 1. Draw a 2-pixel black border (0) around the edges of the binary crop
